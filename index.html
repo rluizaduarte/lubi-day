@@ -1,0 +1,1158 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#e9dfd0" />
+    <title>Lubi-Day</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bege: #e9dfd0;
+        --bege-veu: rgba(233, 223, 208, 0.62);
+        --card: #f7f2ea;
+        --tinta: #4a3f36;
+        --tinta-suave: #7d6f63;
+        --rosa: #e58fae;
+        --rosa-escuro: #d16f94;
+        --linha: rgba(74, 63, 54, 0.14);
+        --raio: 28px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        font-family: "Jost", system-ui, sans-serif;
+        color: var(--tinta);
+        background: var(--bege);
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+
+      /* ---------- fundo: grade de 6 fotos (3 linhas x 2 colunas) ---------- */
+      .fundo {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 1fr);
+        gap: 0;
+        z-index: 0;
+      }
+      .fundo .foto {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #d9c7b3, #c9b39b);
+      }
+      .fundo .foto:nth-child(2) {
+        background: linear-gradient(135deg, #e2cfbd, #cbb49c);
+      }
+      .fundo .foto:nth-child(3) {
+        background: linear-gradient(135deg, #cdb7a0, #dcc9b5);
+      }
+      .fundo .foto:nth-child(4) {
+        background: linear-gradient(135deg, #d6c3ad, #c3ab91);
+      }
+      .fundo .foto:nth-child(5) {
+        background: linear-gradient(135deg, #e0cebb, #c9b19a);
+      }
+      .fundo .foto:nth-child(6) {
+        background: linear-gradient(135deg, #d2bda6, #dfccba);
+      }
+      .fundo .foto img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0;
+        transition: opacity 1.2s ease;
+        transform: scale(1.04);
+        animation: respira 18s ease-in-out infinite alternate;
+      }
+      .fundo .foto img.ok {
+        opacity: 1;
+      }
+      @keyframes respira {
+        from {
+          transform: scale(1.04);
+        }
+        to {
+          transform: scale(1.12);
+        }
+      }
+      .veu {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        background: var(--bege-veu);
+        backdrop-filter: saturate(0.85) blur(0.5px);
+        -webkit-backdrop-filter: saturate(0.85) blur(0.5px);
+      }
+
+      /* ---------- cartão central ---------- */
+      .palco {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: calc(env(safe-area-inset-top, 0px) + 24px) 20px
+          calc(env(safe-area-inset-bottom, 0px) + 24px);
+      }
+      .cartao {
+        width: 100%;
+        max-width: 360px;
+        background: var(--card);
+        border-radius: var(--raio);
+        box-shadow:
+          0 30px 60px -20px rgba(74, 63, 54, 0.35),
+          0 2px 0 rgba(255, 255, 255, 0.6) inset;
+        padding: 40px 30px 34px;
+        position: relative;
+        overflow: hidden;
+        transition: height 0.4s ease;
+      }
+      .cartao::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          120% 80% at 50% -10%,
+          rgba(255, 255, 255, 0.7),
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .tela {
+        display: none;
+        animation: entra 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .tela.ativa {
+        display: block;
+      }
+      .tela.saindo {
+        animation: sai 0.3s ease both;
+      }
+      @keyframes entra {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes sai {
+        from {
+          opacity: 1;
+          transform: none;
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+
+      .tela > * {
+        animation: entra 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      }
+      .tela > *:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .tela > *:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .tela > *:nth-child(3) {
+        animation-delay: 0.25s;
+      }
+      .tela > *:nth-child(4) {
+        animation-delay: 0.35s;
+      }
+      .tela > *:nth-child(5) {
+        animation-delay: 0.45s;
+      }
+      .tela > *:nth-child(6) {
+        animation-delay: 0.55s;
+      }
+
+      h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 500;
+        font-size: 2rem;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin-bottom: 18px;
+      }
+      h1.grande {
+        font-size: 2.4rem;
+        text-align: center;
+        font-weight: 600;
+      }
+      h1 em {
+        font-style: italic;
+        color: var(--rosa-escuro);
+      }
+      p {
+        font-weight: 300;
+        font-size: 1.02rem;
+        line-height: 1.6;
+        color: var(--tinta);
+        margin-bottom: 14px;
+      }
+      p.suave {
+        color: var(--tinta-suave);
+        font-size: 0.95rem;
+      }
+      p.centro {
+        text-align: center;
+      }
+      .ornamento {
+        width: 38px;
+        height: 1px;
+        background: var(--rosa);
+        margin: 0 auto 22px;
+        opacity: 0.8;
+        position: relative;
+      }
+      .ornamento::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -3px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rosa);
+        transform: translateX(-50%);
+      }
+
+      .acoes {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 26px;
+      }
+      .acoes.lado {
+        flex-direction: row;
+      }
+      .acoes.lado .btn {
+        flex: 1;
+      }
+
+      .btn {
+        appearance: none;
+        border: 0;
+        outline: 0;
+        cursor: pointer;
+        font-family: "Jost", sans-serif;
+        font-weight: 400;
+        font-size: 0.98rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 15px 22px;
+        border-radius: 999px;
+        background: var(--tinta);
+        color: var(--card);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.25s ease,
+          background 0.25s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          120deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.25) 50%,
+          transparent 70%
+        );
+        transform: translateX(-120%);
+        transition: transform 0.6s ease;
+      }
+      .btn:hover::after,
+      .btn:focus-visible::after {
+        transform: translateX(120%);
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px -12px rgba(74, 63, 54, 0.6);
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn.rosa {
+        background: var(--rosa);
+        color: #fff;
+      }
+      .btn.rosa:hover {
+        background: var(--rosa-escuro);
+      }
+      .btn.fantasma {
+        background: transparent;
+        color: var(--tinta);
+        box-shadow: 0 0 0 1px var(--linha) inset;
+      }
+      .btn.fantasma:hover {
+        background: rgba(74, 63, 54, 0.05);
+      }
+      .btn.link {
+        background: #fff;
+        color: var(--tinta);
+        box-shadow:
+          0 1px 0 rgba(255, 255, 255, 0.8) inset,
+          0 8px 20px -14px rgba(74, 63, 54, 0.5);
+        text-transform: none;
+        letter-spacing: 0;
+        font-size: 1rem;
+        justify-content: space-between;
+        padding: 14px 18px 14px 20px;
+      }
+      .btn.link small {
+        color: var(--tinta-suave);
+        font-weight: 300;
+        font-size: 0.85rem;
+        display: block;
+        margin-top: 2px;
+      }
+      .btn.link span {
+        text-align: left;
+        line-height: 1.25;
+      }
+      .btn.link svg {
+        flex: none;
+        width: 18px;
+        height: 18px;
+        stroke: var(--rosa-escuro);
+      }
+
+      /* ---------- checklist ---------- */
+      .lista {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .lista li {
+        animation: entra 0.5s both;
+      }
+      .lista li:nth-child(1) {
+        animation-delay: 0.2s;
+      }
+      .lista li:nth-child(2) {
+        animation-delay: 0.27s;
+      }
+      .lista li:nth-child(3) {
+        animation-delay: 0.34s;
+      }
+      .lista li:nth-child(4) {
+        animation-delay: 0.41s;
+      }
+      .lista li:nth-child(5) {
+        animation-delay: 0.48s;
+      }
+      .lista li:nth-child(6) {
+        animation-delay: 0.55s;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.55);
+        cursor: pointer;
+        transition:
+          background 0.25s ease,
+          transform 0.18s ease;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .item:active {
+        transform: scale(0.985);
+      }
+      .item input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .caixa {
+        flex: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        border: 1.5px solid var(--tinta-suave);
+        display: grid;
+        place-items: center;
+        transition:
+          background 0.25s ease,
+          border-color 0.25s ease,
+          transform 0.25s cubic-bezier(0.3, 1.6, 0.4, 1);
+        background: #fff;
+      }
+      .caixa svg {
+        width: 14px;
+        height: 14px;
+        stroke: #fff;
+        stroke-width: 2.5;
+        fill: none;
+        stroke-dasharray: 20;
+        stroke-dashoffset: 20;
+        transition: stroke-dashoffset 0.3s ease 0.05s;
+      }
+      .item input:checked ~ .caixa {
+        background: var(--rosa);
+        border-color: var(--rosa);
+        transform: scale(1.08);
+      }
+      .item input:checked ~ .caixa svg {
+        stroke-dashoffset: 0;
+      }
+      .rotulo {
+        font-weight: 300;
+        font-size: 1rem;
+        line-height: 1.3;
+        transition:
+          color 0.25s ease,
+          opacity 0.25s ease;
+      }
+      .rotulo a {
+        color: var(--rosa-escuro);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(209, 111, 148, 0.4);
+      }
+      .item input:checked ~ .rotulo {
+        text-decoration: line-through;
+        text-decoration-color: rgba(74, 63, 54, 0.35);
+        opacity: 0.6;
+      }
+      .item.feito {
+        background: rgba(229, 143, 174, 0.12);
+      }
+
+      /* ---------- programação da feira ---------- */
+      .programa {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 6px 0 4px;
+      }
+      .programa div {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--linha);
+        font-weight: 300;
+        line-height: 1.45;
+      }
+      .programa div:last-child {
+        border-bottom: 0;
+      }
+      .programa i {
+        flex: none;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--rosa);
+        margin-top: 8px;
+      }
+      .programa small {
+        display: block;
+        color: var(--tinta-suave);
+        font-size: 0.86rem;
+        font-style: italic;
+        margin-top: 2px;
+      }
+
+      /* ---------- coração final ---------- */
+      .coracao {
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 18px auto 4px;
+        animation: bate 1.6s ease-in-out infinite;
+        filter: drop-shadow(0 10px 18px rgba(229, 143, 174, 0.45));
+      }
+      @keyframes bate {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        14% {
+          transform: scale(1.12);
+        }
+        28% {
+          transform: scale(1);
+        }
+        42% {
+          transform: scale(1.1);
+        }
+        70% {
+          transform: scale(1);
+        }
+      }
+
+      /* ---------- pétalas na tela final ---------- */
+      .petalas {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 3;
+        overflow: hidden;
+        display: none;
+      }
+      .petalas.on {
+        display: block;
+      }
+      .petala {
+        position: absolute;
+        top: -20px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50% 50% 50% 0;
+        background: var(--rosa);
+        opacity: 0.75;
+        animation: cai linear forwards;
+      }
+      @keyframes cai {
+        to {
+          transform: translateY(110vh) rotate(540deg) translateX(40px);
+          opacity: 0;
+        }
+      }
+
+      .passo {
+        position: absolute;
+        top: 16px;
+        right: 22px;
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        color: var(--tinta-suave);
+        opacity: 0.65;
+        font-weight: 400;
+      }
+      .reiniciar {
+        position: fixed;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+        left: 0;
+        right: 0;
+        text-align: center;
+        z-index: 2;
+      }
+      .reiniciar button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        font-family: "Jost", sans-serif;
+        font-size: 0.72rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--tinta-suave);
+        opacity: 0.55;
+        padding: 6px 10px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fundo: substitua os arquivos foto1.jpg ... foto6.jpg pelas suas fotos (mesma pasta). -->
+    <div class="fundo" aria-hidden="true">
+      <div class="foto"><img src="foto1.png" alt="" /></div>
+      <div class="foto"><img src="foto2.png" alt="" /></div>
+      <div class="foto"><img src="foto3.png" alt="" /></div>
+      <div class="foto"><img src="foto4.png" alt="" /></div>
+      <div class="foto"><img src="foto5.png" alt="" /></div>
+      <div class="foto"><img src="foto6.png" alt="" /></div>
+    </div>
+    <div class="veu" aria-hidden="true"></div>
+    <div class="petalas" id="petalas" aria-hidden="true"></div>
+
+    <main class="palco">
+      <section class="cartao" id="cartao" aria-live="polite">
+        <span class="passo" id="passo"></span>
+
+        <!-- 1 -->
+        <div class="tela" data-tela="intro1">
+          <div class="ornamento"></div>
+          <h1>Bom dia, <em>meu bem!</em></h1>
+          <p>
+            Hoje o dia vai ser diferente. Não é feriado, nem aniversário, nem
+            data comemorativa, mas quem disse que eu preciso de datas especiais
+            pra te fazer algo especial?
+          </p>
+          <div class="acoes">
+            <button class="btn" data-vai="intro2">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="tela" data-tela="intro2">
+          <div class="ornamento"></div>
+          <p>
+            Espero que dê certo e seu dia seja ótimo, porque o meu já é
+            suficientemente perfeito somente de acordar do teu lado.
+          </p>
+          <div class="acoes">
+            <button class="btn" data-vai="almoco">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="tela" data-tela="almoco">
+          <div class="ornamento"></div>
+          <h1>Pro nosso <em>almoço</em></h1>
+          <p>
+            Achei um menu que é a sua cara. O
+            <strong>Onda – Cozinha do Mar</strong> está participando do Recife
+            Restaurant Week e tem um menu de três etapas que acho que você vai
+            adorar!
+          </p>
+          <p class="suave">Topa?</p>
+          <div class="acoes lado">
+            <button class="btn rosa" data-vai="almoco-sim">Sim</button>
+            <button class="btn fantasma" data-vai="almoco-nao">Não</button>
+          </div>
+        </div>
+
+        <!-- 3b -->
+        <div class="tela" data-tela="almoco-nao">
+          <div class="ornamento"></div>
+          <h1>Oxente, meu amor! <em>Não?</em></h1>
+          <p>
+            Tudo bem… aqui está o link de outros restaurantes participantes.
+          </p>
+          <div class="acoes">
+            <a
+              class="btn link"
+              id="lnk-rw"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              <span
+                >Recife Restaurant Week<small
+                  >restaurantes participantes</small
+                ></span
+              >
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </a>
+            <button class="btn fantasma" data-vai="almoco">
+              Deixa eu pensar de novo
+            </button>
+            <button class="btn" data-vai="look">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 3a -->
+        <div class="tela" data-tela="almoco-sim">
+          <h1 class="grande">OBAAAAAA!!!</h1>
+          <p class="centro">Então vamos nos apressar!</p>
+          <div class="acoes">
+            <a
+              class="btn link"
+              id="lnk-onda-mapa"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              <span
+                >Esse é o endereço<small
+                  >Av. Conselheiro Aguiar, 826 · Boa Viagem</small
+                ></span
+              >
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+            </a>
+            <a
+              class="btn link"
+              id="lnk-onda-ig"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              <span>Esse é o instagram<small id="onda-ig-handle"></small></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+              </svg>
+            </a>
+            <button class="btn" data-vai="look">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="tela" data-tela="look">
+          <div class="ornamento"></div>
+          <p>
+            Você sabe que sou louca por você em toda e qualquer roupa, mas tem
+            um look que você me deixa maluca.
+          </p>
+          <p>
+            Seu topzinho preto da <strong>TRIBOS</strong> sempre me pegou muito,
+            não sei explicar.
+          </p>
+          <p class="suave">
+            O resto você decide, mas vai ficar linda de qualquer jeito.
+          </p>
+          <div class="acoes">
+            <button class="btn" data-vai="chegamos">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="tela" data-tela="chegamos">
+          <div class="ornamento"></div>
+          <h1 class="grande">Já chegamos?</h1>
+          <div class="acoes lado">
+            <button class="btn rosa" data-vai="checklist">Sim</button>
+            <button class="btn fantasma" data-vai="chegamos-nao">Não</button>
+          </div>
+        </div>
+
+        <div class="tela" data-tela="chegamos-nao">
+          <div class="ornamento"></div>
+          <p class="centro">Ah, ok. Volta pra outra tela então...</p>
+          <div class="acoes">
+            <button class="btn fantasma" data-vai="chegamos">Voltar</button>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="tela" data-tela="checklist">
+          <h1>Perfeito!!</h1>
+          <p class="suave">
+            Aqui vai um checklist pra gente fazer enquanto estivermos por aqui:
+          </p>
+          <ul class="lista">
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="fotos" /><span class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo">FOTINHASSSSS</span></label
+              >
+            </li>
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="tiktok" /><span class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo"
+                  ><a
+                    href="https://vt.tiktok.com/ZSpqNBSg7/"
+                    target="_blank"
+                    rel="noopener"
+                    >esse tiktok aqui</a
+                  ></span
+                ></label
+              >
+            </li>
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="fofocar" /><span class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo">fofocar</span></label
+              >
+            </li>
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="criticar" /><span
+                  class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo">criticar o restaurante</span></label
+              >
+            </li>
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="beijinho" /><span
+                  class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo">beijinho</span></label
+              >
+            </li>
+            <li>
+              <label class="item"
+                ><input type="checkbox" data-chk="vlog" /><span class="caixa"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" /></svg></span
+                ><span class="rotulo">vlog</span></label
+              >
+            </li>
+          </ul>
+          <div class="acoes">
+            <button class="btn" data-vai="acabamos">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="tela" data-tela="acabamos">
+          <div class="ornamento"></div>
+          <h1 class="grande">Já acabamos?</h1>
+          <div class="acoes lado">
+            <button class="btn rosa" data-vai="mais-ideia">Sim</button>
+            <button class="btn fantasma" data-vai="acabamos-nao">Não</button>
+          </div>
+        </div>
+
+        <div class="tela" data-tela="acabamos-nao">
+          <div class="ornamento"></div>
+          <p class="centro">Ah, ok. Volta pra outra tela então...</p>
+          <div class="acoes">
+            <button class="btn fantasma" data-vai="acabamos">Voltar</button>
+          </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="tela" data-tela="mais-ideia">
+          <div class="ornamento"></div>
+          <h1>Ei, amor, <em>ainda não acabou!</em></h1>
+          <p>Eu tenho mais uma ideia. Que tal irmos na…</p>
+          <div class="acoes">
+            <button class="btn" data-vai="feira">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="tela" data-tela="feira">
+          <h1 class="grande">FEIRA DA<br />AURORA!!</h1>
+          <p class="suave centro">Hoje tem:</p>
+          <div class="programa">
+            <div>
+              <i></i
+              ><span
+                >Sábado de samba com Maria Pagodinho<small
+                  >(seja lá quem essa mulher seja)</small
+                ></span
+              >
+            </div>
+            <div><i></i><span>Polo gastronômico</span></div>
+            <div><i></i><span>E muitas risadas com Ryrdes e Edson!</span></div>
+          </div>
+          <p class="suave centro" style="margin-top: 14px">Topa?</p>
+          <div class="acoes lado">
+            <button class="btn rosa" data-vai="feira-sim">Sim</button>
+            <button class="btn fantasma" data-vai="feira-nao">Não</button>
+          </div>
+        </div>
+
+        <div class="tela" data-tela="feira-nao">
+          <div class="ornamento"></div>
+          <p class="centro">Poxa, amor, tudo bem! A gente pode ir pra casa.</p>
+          <div class="acoes">
+            <button class="btn" data-vai="final1">Continuar</button>
+          </div>
+        </div>
+
+        <div class="tela" data-tela="feira-sim">
+          <h1 class="grande">UHUUUUUL.</h1>
+          <div class="acoes">
+            <a
+              class="btn link"
+              id="lnk-feira-mapa"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              <span
+                >Esse é o endereço<small
+                  >Rua da Aurora, 1377 (altura da Seplag) · Santo Amaro</small
+                ></span
+              >
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11Z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+            </a>
+            <a
+              class="btn link"
+              id="lnk-feira-ig"
+              href="#"
+              target="_blank"
+              rel="noopener"
+            >
+              <span
+                >Esse é o instagram<small id="feira-ig-handle"></small
+              ></span>
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+              </svg>
+            </a>
+            <button class="btn" data-vai="final1">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="tela" data-tela="final1">
+          <div class="ornamento"></div>
+          <p>
+            Meu amor, nosso dia ainda não chegou ao fim, mas já quero te dizer
+            que ter você e ter a sua companhia é a minha maior sorte. Obrigada
+            por tudo.
+          </p>
+          <div class="acoes">
+            <button class="btn" data-vai="final2">Continuar</button>
+          </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="tela" data-tela="final2">
+          <div class="ornamento"></div>
+          <p>Foi isso, meu bem. Espero que tenha gostado. Eu te amo demais.</p>
+          <p>Por mais dias assim ao lado do amor da minha vida.</p>
+          <svg class="coracao" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              fill="#e58fae"
+              d="M12 21s-7.5-4.6-9.6-9.1C.8 8.4 2.6 4.6 6.2 4.1c2.1-.3 4 .7 5.8 2.8 1.8-2.1 3.7-3.1 5.8-2.8 3.6.5 5.4 4.3 3.8 7.8C19.5 16.4 12 21 12 21z"
+            />
+          </svg>
+        </div>
+      </section>
+    </main>
+
+    <div class="reiniciar">
+      <button id="reiniciar" type="button">recomeçar</button>
+    </div>
+
+    <script>
+      (function () {
+        /* ========= CONFIGURAÇÃO: edite aqui os links ========= */
+        var CONFIG = {
+          restaurantWeek: "https://eventos.restaurantweek.com.br/recife",
+          onda: {
+            endereco:
+              "Onda Cozinha do Mar, Av. Conselheiro Aguiar, 826, Boa Viagem, Recife - PE",
+            instagram: "onda.cozinhadomar", // confirme o @ antes do dia
+          },
+          feira: {
+            endereco: "Rua da Aurora, 1377, Santo Amaro, Recife - PE",
+            instagram: "feiradaaurora", // confirme o @ antes do dia
+          },
+        };
+        /* ===================================================== */
+
+        function mapa(q) {
+          return (
+            "https://www.google.com/maps/search/?api=1&query=" +
+            encodeURIComponent(q)
+          );
+        }
+        function ig(h) {
+          return "https://www.instagram.com/" + h.replace(/^@/, "") + "/";
+        }
+
+        document.getElementById("lnk-rw").href = CONFIG.restaurantWeek;
+        document.getElementById("lnk-onda-mapa").href = mapa(
+          CONFIG.onda.endereco,
+        );
+        document.getElementById("lnk-onda-ig").href = ig(CONFIG.onda.instagram);
+        document.getElementById("onda-ig-handle").textContent =
+          "@" + CONFIG.onda.instagram.replace(/^@/, "");
+        document.getElementById("lnk-feira-mapa").href = mapa(
+          CONFIG.feira.endereco,
+        );
+        document.getElementById("lnk-feira-ig").href = ig(
+          CONFIG.feira.instagram,
+        );
+        document.getElementById("feira-ig-handle").textContent =
+          "@" + CONFIG.feira.instagram.replace(/^@/, "");
+
+        /* fotos de fundo: só exibe quando carregar; se faltar, fica o tom bege */
+        document.querySelectorAll(".fundo img").forEach(function (img) {
+          if (img.complete && img.naturalWidth) img.classList.add("ok");
+          img.addEventListener("load", function () {
+            img.classList.add("ok");
+          });
+          img.addEventListener("error", function () {
+            img.remove();
+          });
+        });
+
+        /* navegação */
+        var telas = Array.prototype.slice.call(
+          document.querySelectorAll(".tela"),
+        );
+        var ordem = telas.map(function (t) {
+          return t.dataset.tela;
+        });
+        var principais = [
+          "intro1",
+          "intro2",
+          "almoco",
+          "look",
+          "chegamos",
+          "checklist",
+          "acabamos",
+          "mais-ideia",
+          "feira",
+          "final1",
+          "final2",
+        ];
+        var atual = null,
+          animando = false;
+        var passo = document.getElementById("passo");
+        var petalas = document.getElementById("petalas");
+
+        function salvar(k, v) {
+          try {
+            localStorage.setItem("surpresa:" + k, v);
+          } catch (e) {}
+        }
+        function ler(k) {
+          try {
+            return localStorage.getItem("surpresa:" + k);
+          } catch (e) {
+            return null;
+          }
+        }
+
+        function mostrar(nome, instantaneo) {
+          var alvo = telas.find
+            ? telas.find(function (t) {
+                return t.dataset.tela === nome;
+              })
+            : telas.filter(function (t) {
+                return t.dataset.tela === nome;
+              })[0];
+          if (!alvo || animando) return;
+          var anterior = telas.filter(function (t) {
+            return t.classList.contains("ativa");
+          })[0];
+
+          function troca() {
+            telas.forEach(function (t) {
+              t.classList.remove("ativa", "saindo");
+            });
+            // reinicia animações dos filhos
+            Array.prototype.forEach.call(alvo.children, function (c) {
+              c.style.animation = "none";
+              c.offsetHeight;
+              c.style.animation = "";
+            });
+            alvo.classList.add("ativa");
+            atual = nome;
+            salvar("tela", nome);
+            var idx = principais.indexOf(nome);
+            passo.textContent =
+              idx >= 0 ? idx + 1 + " / " + principais.length : "";
+            petalas.classList.toggle("on", nome === "final2");
+            if (nome === "final2") soltarPetalas();
+            animando = false;
+            window.scrollTo(0, 0);
+          }
+
+          if (anterior && !instantaneo) {
+            animando = true;
+            anterior.classList.add("saindo");
+            setTimeout(troca, 280);
+          } else {
+            troca();
+          }
+        }
+
+        document.addEventListener("click", function (e) {
+          var b = e.target.closest("[data-vai]");
+          if (b) {
+            e.preventDefault();
+            mostrar(b.dataset.vai);
+          }
+        });
+
+        /* checklist com persistência */
+        document.querySelectorAll("[data-chk]").forEach(function (cb) {
+          var k = "chk:" + cb.dataset.chk;
+          if (ler(k) === "1") {
+            cb.checked = true;
+            cb.closest(".item").classList.add("feito");
+          }
+          cb.addEventListener("change", function () {
+            salvar(k, cb.checked ? "1" : "0");
+            cb.closest(".item").classList.toggle("feito", cb.checked);
+          });
+        });
+
+        /* pétalas */
+        var petalasFeitas = false;
+        function soltarPetalas() {
+          if (petalasFeitas) return;
+          petalasFeitas = true;
+          for (var i = 0; i < 28; i++) {
+            var p = document.createElement("span");
+            p.className = "petala";
+            p.style.left = Math.random() * 100 + "vw";
+            p.style.animationDuration = 5 + Math.random() * 5 + "s";
+            p.style.animationDelay = Math.random() * 4 + "s";
+            p.style.width = p.style.height = 8 + Math.random() * 8 + "px";
+            p.style.opacity = 0.4 + Math.random() * 0.5;
+            petalas.appendChild(p);
+          }
+        }
+
+        /* reiniciar */
+        document
+          .getElementById("reiniciar")
+          .addEventListener("click", function () {
+            try {
+              Object.keys(localStorage).forEach(function (k) {
+                if (k.indexOf("surpresa:") === 0) localStorage.removeItem(k);
+              });
+            } catch (e) {}
+            document.querySelectorAll("[data-chk]").forEach(function (cb) {
+              cb.checked = false;
+              cb.closest(".item").classList.remove("feito");
+            });
+            petalas.innerHTML = "";
+            petalasFeitas = false;
+            mostrar("intro1");
+          });
+
+        /* início: retoma de onde parou */
+        var inicio = ler("tela");
+        mostrar(ordem.indexOf(inicio) >= 0 ? inicio : "intro1", true);
+      })();
+    </script>
+  </body>
+</html>
